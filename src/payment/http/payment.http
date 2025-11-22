@@ -1,0 +1,47 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMxLCJlbWFpbCI6Imx1bHkwOTAyMjAwNkBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjM3NzY3NDAsImV4cCI6MTc2Mzg2MzE0MH0.pSGaL2_KlUyDJTEfPc1_9tgKEnvEW5cTYt9_zroKjC8
+@sessionId = cs_test_a1uy4UjD1mR2ODmK8ZTBf0Y2fU8PduVtqqggdy9LHXZutJHIj7xbJPUAyL
+
+### Crear sesión de pago
+POST {{baseUrl}}/payments/stripe/checkout
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "orderId": 6
+}
+
+### Verificar Estado de Pago
+GET {{baseUrl}}/payments/verify?sessionId={{sessionId}}
+Authorization: Bearer {{token}}
+
+### Obtener todos los pagos (solo admin)
+GET {{baseUrl}}/payments
+Authorization: Bearer {{token}}
+
+### Obtener pago por ID
+GET {{baseUrl}}/payments/3
+Authorization: Bearer {{token}}
+
+### Actualizar un pago
+PATCH {{baseUrl}}/payments/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "method": "paypal",
+    "status": "paid"
+}
+
+### Cambiar estado del pago
+PATCH {{baseUrl}}/payments/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "status": "refunded"
+}
+
+### Eliminar pago
+DELETE {{baseUrl}}/payments/1
+Authorization: Bearer {{token}}

@@ -1,0 +1,102 @@
+@baseUrl = http://localhost:3000
+// Token Usuario Cliente
+//@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMzLCJlbWFpbCI6Inl1bGVpYmlzbm9lbWlhcm1lbnRhY3J1ekBnbWFpbC5jb20iLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzYzNzc3NDIwLCJleHAiOjE3NjM4NjM4MjB9.hWkm5EiR-g_gOn1WBHzY6X2NIWkPiWNZ-nKgdEseX_A
+// Token Usuario Admin (Para las dos últimas pruebas debe ser admintoken)
+//@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMxLCJlbWFpbCI6Imx1bHkwOTAyMjAwNkBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjM3NzY3NDAsImV4cCI6MTc2Mzg2MzE0MH0.pSGaL2_KlUyDJTEfPc1_9tgKEnvEW5cTYt9_zroKjC8
+//@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMxLCJlbWFpbCI6Imx1bHkwOTAyMjAwNkBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjM3NzY3NDAsImV4cCI6MTc2Mzg2MzE0MH0.pSGaL2_KlUyDJTEfPc1_9tgKEnvEW5cTYt9_zroKjC8
+
+
+### Crear una Orden (USO CLIENTE)
+// El stock se descuenta aquí. El cartId debe ser del usuario y estar checkedOut: true.
+POST {{baseUrl}}/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "cartId": 1
+}
+
+
+### Ver Mis Órdenes
+GET {{baseUrl}}/orders/my-orders
+Authorization: Bearer {{token}}
+
+
+### Ver Mi Orden Específica by ID
+GET {{baseUrl}}/orders/1
+Authorization: Bearer {{token}}
+
+
+###Intentar ver la Orden de Otro Usuario (IDOR Check)
+GET {{baseUrl}}/orders/4
+Authorization: Bearer {{token}}
+
+
+### Cancelar Mi Orden (Acción de Cliente)
+// Solo se puede cancelar si está PENDING.
+PATCH {{baseUrl}}/orders/2/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "status": "CANCELLED"
+}
+
+
+### Intentar Poner un Estado que NO sea CANCELLED (CLIENTE)
+PATCH {{baseUrl}}/orders/1/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "status": "CONFIRMED"
+}
+
+### Intentar crear orden con carrito de otro usuario
+// El servicio busca el carrito por id Y el userId del token.
+POST {{baseUrl}}/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "cartId": 1
+}
+
+### Intentar crear orden con carrito NO finalizado (checkedOut: false)
+POST {{baseUrl}}/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "cartId": 2
+}
+
+### Cliente intenta actualizar la orden
+// ESPERA: 403 Forbidden
+PATCH {{baseUrl}}/orders/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "total": 500
+}
+
+///////////// SOLO ADMINS //////////////
+### Cliente intenta ver todas las órdenes
+GET {{baseUrl}}/orders
+Authorization: Bearer {{token}}
+
+
+### Administrador ve todas las órdenes
+GET {{baseUrl}}/orders
+Authorization: Bearer {{adminToken}}
+
+
+### Administrador cambia estado a PENDING-PAID-CANCELLED
+PATCH {{baseUrl}}/orders/1/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "status": "PENDING"
+}

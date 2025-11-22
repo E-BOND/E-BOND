@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMxLCJlbWFpbCI6Imx1bHkwOTAyMjAwNkBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjM3NzY3NDAsImV4cCI6MTc2Mzg2MzE0MH0.pSGaL2_KlUyDJTEfPc1_9tgKEnvEW5cTYt9_zroKjC8
+### Crear usuario
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "nombre": "Yuleibis",
+    "apellido": "Armenta",
+    "email": "luly09022006@gmail.com",
+    "telefono": "304636344447",
+    "password": "123456789",
+    "role": "ADMIN"
+
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "luly09022006@gmail.com",
+    "password": "123456789"
+}
+
+### Listar todos los usuarios (solo admin)
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+### Obtener un usuario por ID
+GET {{baseUrl}}/users/1
+Authorization: Bearer {{token}}
+
+### Actualizar un usuario
+PATCH {{baseUrl}}/users/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "telefono": "31099879",
+    "password": "12345678910"
+}
+
+### Eliminar un usuario (solo admin)
+DELETE {{baseUrl}}/users/2
+Authorization: Bearer {{token}}

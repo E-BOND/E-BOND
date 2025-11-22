@@ -1,0 +1,42 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIzLCJlbWFpbCI6ImFkcmlAZXhhbXBsZS5jb20iLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzYzMjI4MDU4LCJleHAiOjE3NjMzMTQ0NTh9.UCb2n8kf_H1_uL-MI-mh46C83KtziBniUndFkhQBnRU
+### Crear un rol
+POST {{baseUrl}}/roles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "nombre": "ADMIN",
+    "descripcion": "Acceso completo al sistema"
+}
+
+### Crear otro rol
+POST {{baseUrl}}/roles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "nombre": "CLIENT",
+    "descripcion": "Usuario registrado con permisos básicos"
+}
+
+### Listar roles
+GET {{baseUrl}}/roles
+Authorization: Bearer {{token}}
+
+### Obtener un rol por ID
+GET {{baseUrl}}/roles/1
+Authorization: Bearer {{token}}
+
+### Actualizar un rol
+PATCH {{baseUrl}}/roles/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "descripcion": "Puede ver y modificar sus pedidos"
+}
+
+### Eliminar un rol
+DELETE {{baseUrl}}/roles/2
+Authorization: Bearer {{token}}

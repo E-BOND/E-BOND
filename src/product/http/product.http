@@ -1,0 +1,35 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMxLCJlbWFpbCI6Imx1bHkwOTAyMjAwNkBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjM3NzY3NDAsImV4cCI6MTc2Mzg2MzE0MH0.pSGaL2_KlUyDJTEfPc1_9tgKEnvEW5cTYt9_zroKjC8
+
+### 1. OBTENER todos los productos tech desde DummyJSON
+GET {{baseUrl}}/products/external/tech
+Authorization: Bearer {{token}}
+
+### 2. BUSCAR productos tech en DummyJSON
+GET {{baseUrl}}/products/external/search?q=iphone
+Authorization: Bearer {{token}}
+
+### Buscar laptops
+GET {{baseUrl}}/products/external/search?q=laptop
+Authorization: Bearer {{token}}
+
+### Buscar tablets
+GET {{baseUrl}}/products/external/search?q=tablet
+Authorization: Bearer {{token}}
+
+### 3. IMPORTAR productos tech a la base de datos (SOLO ADMIN)
+POST {{baseUrl}}/products/import/tech
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "categoryIds": [1]
+}
+
+### 4. OBTENER productos LOCALES ya guardados en la base de datos
+GET {{baseUrl}}/products/local
+Authorization: Bearer {{token}}
+
+### 5. OBTENER un producto local por ID (CORRECTO)
+GET {{baseUrl}}/products/local/by-id?id=47
+Authorization: Bearer {{token}}

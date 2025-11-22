@@ -1,0 +1,39 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMxLCJlbWFpbCI6Imx1bHkwOTAyMjAwNkBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjM3NzY3NDAsImV4cCI6MTc2Mzg2MzE0MH0.pSGaL2_KlUyDJTEfPc1_9tgKEnvEW5cTYt9_zroKjC8
+### Crear factura
+POST {{baseUrl}}/invoices
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "userId": 1,
+    "orderId": 3,
+    "paymentId": 3,
+    "totalAmount": 450000,
+    "invoiceNumber": "INV-2025-001"
+}
+
+### Obtener todas las facturas
+GET {{baseUrl}}/invoices
+Authorization: Bearer {{token}}
+
+### Obtener factura por ID
+GET {{baseUrl}}/invoices/1
+Authorization: Bearer {{token}}
+
+### Actualizar factura
+PATCH {{baseUrl}}/invoices/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "totalAmount": 260.00
+}
+
+### Cancelar factura
+PATCH {{baseUrl}}/invoices/1/cancel
+Authorization: Bearer {{token}}
+
+### Eliminar factura
+DELETE {{baseUrl}}/invoices/1
+Authorization: Bearer {{token}}
