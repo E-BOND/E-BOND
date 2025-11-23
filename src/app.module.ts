@@ -29,7 +29,7 @@ import { StripeModule } from './stripe/stripe.module';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '3131',
+      password: '1111',
       database: 'taller5', // Nombre de la base de datos
       autoLoadEntities: true,
       synchronize: true,
