@@ -4,7 +4,6 @@ import { ApiTags, ApiOperation, ApiBody, ApiQuery, ApiBearerAuth } from '@nestjs
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../user/entities/user.entity';
 import { ImportProductsDto } from './dtos/import-products.dto';
 
 @ApiTags('Products')
@@ -15,7 +14,7 @@ export class ProductController {
     constructor(private readonly productService: ProductService) {}
 
     @Post('import/tech')
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @ApiOperation({ summary: 'Importar productos tecnológicos desde DummyJSON (solo ADMIN)' })
     @ApiBody({ type: ImportProductsDto })
     async importTechProducts(@Body() body: ImportProductsDto) {

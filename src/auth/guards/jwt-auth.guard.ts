@@ -18,9 +18,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         ]);
 
         if (isPublic) {
-            return true; // Permite el acceso sin token
+            return true;
         }
 
-        return super.canActivate(context); // Requiere token
+        return super.canActivate(context); 
     }
 }

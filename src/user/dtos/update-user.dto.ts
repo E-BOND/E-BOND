@@ -1,5 +1,7 @@
-import { IsOptional, IsEnum, IsString, MinLength, IsEmail } from 'class-validator';
-import { UserRole } from '../entities/user.entity';
+import { IsOptional, IsEnum, IsString, MinLength, IsEmail, IsNumber } from 'class-validator';
+import { OneToMany } from 'typeorm';
+import { Role } from '../../role/entities/role.entity';
+
 
 export class UpdateUserDto {
     @IsOptional()
@@ -24,6 +26,6 @@ export class UpdateUserDto {
     password?: string;
 
     @IsOptional()
-    @IsEnum(UserRole)
-    role?: UserRole;
+    @IsNumber()
+    roleId?: number; 
 }

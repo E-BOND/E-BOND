@@ -1,8 +1,9 @@
-import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User, UserRole } from '../user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import { MailService } from './mail/mail.service';
@@ -17,6 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
     private mailService: MailService,
     private readonly roleService: RoleService,
+    private configService: ConfigService, // AGREGAR ESTO
   ) {}
 
   private addHours(date: Date, hours: number) {
@@ -27,7 +29,7 @@ export class AuthService {
     return new Date(date.getTime() + minutes * 60 * 1000);
   }
 
-async register(dto: RegisterDto) { 
+  async register(dto: RegisterDto) { 
     const exists = await this.usersRepo.findOne({ where: { email: dto.email } });
     if (exists) throw new BadRequestException('El usuario ya existe');
 
@@ -50,10 +52,8 @@ async register(dto: RegisterDto) {
     await this.mailService.sendVerificationEmail(dto.email, verificationToken);
 
     return { message: 'Usuario registrado. Verifica tu correo.' };
-}
+  }
 
-
-  // Verificación de correo
   async verifyEmail(token: string) {
     const user = await this.usersRepo.findOne({ where: { verificationToken: token } });
     if (!user) throw new BadRequestException('Token inválido o expirado');
@@ -72,15 +72,11 @@ async register(dto: RegisterDto) {
     return { message: 'Cuenta verificada con éxito.' };
   }
 
-  // Login de usuario
- async login(email: string, password: string) {
-
+  async login(email: string, password: string) {
     const user = await this.usersRepo.findOne({ 
-        where: { email },
-        relations: ['role'],
-        select: [
-            'id', 'email', 'password', 'isVerified'
-        ]
+      where: { email },
+      relations: ['role'],
+      select: ['id', 'email', 'password', 'isVerified']
     }); 
 
     if (!user) throw new BadRequestException('Usuario no encontrado');
@@ -95,20 +91,24 @@ async register(dto: RegisterDto) {
     const roleName = user.role.nombre;
 
     const payload = { 
-        sub: user.id, 
-        email: user.email, 
-        role: roleName 
+      sub: user.id, 
+      email: user.email, 
+      role: roleName 
     }; 
     
     const token = this.jwtService.sign(payload);
 
-    return {
-        access_token: token,
-        user: { id: user.id, email: user.email, role: roleName },
-    };
-}
+    // NUEVO: Console log correcto del secreto
+    const secret = this.configService.get<string>('JWT_SECRET');
+    console.log('--- SECRETO DE FIRMA EN AUTH SERVICE:', secret);
+    console.log('--- TOKEN GENERADO:', token);
 
-  // Solicitud de recuperación de contraseña
+    return {
+      access_token: token,
+      user: { id: user.id, email: user.email, role: roleName },
+    };
+  }
+
   async requestPasswordReset(email: string) {
     const user = await this.usersRepo.findOne({ where: { email } });
     if (!user) throw new BadRequestException('Usuario no encontrado');
@@ -123,7 +123,6 @@ async register(dto: RegisterDto) {
     return { message: 'Correo de recuperación enviado. Revisa tu bandeja.' };
   }
 
-  // Reseteo de contraseña
   async resetPassword(token: string, newPassword: string) {
     const user = await this.usersRepo.findOne({ where: { resetToken: token } });
     if (!user) throw new BadRequestException('Token inválido');

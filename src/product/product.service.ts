@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, ILike } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { Category } from '../category/entities/category.entity';
 import { HttpService } from '@nestjs/axios';
@@ -164,4 +164,46 @@ export class ProductService {
 
         return product;
     }
+
+    // ===========================
+    // GET producto local por nombre
+    // ===========================
+    async searchLocalProductDetails(query: string): Promise<Product | null> {
+    const product = await this.productRepository.findOne({
+        where: [
+            { name: ILike(`%${query}%`) },
+            { description: ILike(`%${query}%`) },
+        ],
+        relations: ['categories'],
+    });
+
+    // Devuelve el producto encontrado o null si no hay coincidencias.
+    return product || null; 
+}
+// ===========================
+//  BUSQUEDA MÚLTIPLE para COMPARACIÓN
+// ===========================
+async searchMultipleLocalProducts(queries: string[]): Promise<Product[]> {
+    if (!queries || queries.length === 0) {
+        return [];
+    }
+
+    // Crear una lista de condiciones para buscar cada consulta en el nombre o descripción
+    const conditions = queries.flatMap(query => [
+        { name: ILike(`%${query}%`) },
+        { description: ILike(`%${query}%`) },
+    ]);
+
+    // Usar find y el operador OR implícito de TypeORM para buscar por múltiples condiciones.
+    const products = await this.productRepository.find({
+        where: conditions,
+        relations: ['categories'],
+    });
+    
+    // Devolver solo los resultados únicos
+    const uniqueProducts = Array.from(new Set(products.map(p => p.id)))
+        .map(id => products.find(p => p.id === id)) as Product[];
+        
+    return uniqueProducts;
+}
 }

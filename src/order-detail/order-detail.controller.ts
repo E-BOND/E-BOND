@@ -16,7 +16,7 @@ import { UpdateOrderDetailDto } from './dtos/update-order-detail.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../user/entities/user.entity';
+
 
 @Controller('order-details')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -26,7 +26,7 @@ export class OrderDetailController {
     // ============================
     // FIND ALL (SOLO ADMIN)
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Get()
     findAll() {
         return this.service.findAll();
@@ -41,7 +41,7 @@ export class OrderDetailController {
         const currentUserId = Number(req.user.userId);
         
         // Si no es ADMIN, pasa el ID del usuario para forzar el filtro de propiedad.
-        if (currentUserRole !== UserRole.ADMIN) {
+        if (currentUserRole !== 'ADMIN') {
             return this.service.findOne(id, currentUserId);
         }
         
@@ -52,7 +52,7 @@ export class OrderDetailController {
     // ============================
     // CREATE (SOLO ADMIN / Lógica interna)
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Post()
     create(@Body() dto: CreateOrderDetailDto) {
         return this.service.create(dto);
@@ -61,7 +61,7 @@ export class OrderDetailController {
     // ============================
     // UPDATE (SOLO ADMIN)
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Patch(':id')
     update(
         @Param('id', ParseIntPipe) id: number,
@@ -73,7 +73,7 @@ export class OrderDetailController {
     // ============================
     // DELETE (SOLO ADMIN)
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.service.remove(id);

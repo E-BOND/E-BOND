@@ -1,17 +1,31 @@
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMxLCJlbWFpbCI6Imx1bHkwOTAyMjAwNkBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjM3NzY3NDAsImV4cCI6MTc2Mzg2MzE0MH0.pSGaL2_KlUyDJTEfPc1_9tgKEnvEW5cTYt9_zroKjC8
-### Crear usuario
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsImVtYWlsIjoiYW5naWVAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY0MDI1NDUzLCJleHAiOjE3NjQxMTE4NTN9.zy7y5Dp643lFQbae1pRL4UvJhI_6mtxaAa_k_cwyXzE
+### Crear usuario cliente
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
     "nombre": "Yuleibis",
     "apellido": "Armenta",
-    "email": "luly09022006@gmail.com",
-    "telefono": "304636344447",
-    "password": "123456789",
-    "role": "ADMIN"
+    "email": "angiecabal35@gmail.com",
+    "telefono": "30463634447",
+    "password": "1111111"
 
+}
+
+### Crear usuario ADMIN
+POST {{baseUrl}}/users 
+Content-Type: application/json
+Authorization: Bearer {{token}} 
+
+{
+    "nombre": "Nuevo",
+    "apellido": "Administrador",
+    "email": "nuevo.admin@empresa.com",
+    "telefono": "30463634447",
+    "password": "1111111",
+    "roleId": 1
 }
 
 ### Login
@@ -19,8 +33,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "luly09022006@gmail.com",
-    "password": "123456789"
+    "email": "angie@gmail.com",
+    "password": "1111111"
 }
 
 ### Listar todos los usuarios (solo admin)
@@ -37,7 +51,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "telefono": "31099879",
+    "telefono": "310998790",
     "password": "12345678910"
 }
 

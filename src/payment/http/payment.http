@@ -1,14 +1,13 @@
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMxLCJlbWFpbCI6Imx1bHkwOTAyMjAwNkBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjM3NzY3NDAsImV4cCI6MTc2Mzg2MzE0MH0.pSGaL2_KlUyDJTEfPc1_9tgKEnvEW5cTYt9_zroKjC8
-@sessionId = cs_test_a1uy4UjD1mR2ODmK8ZTBf0Y2fU8PduVtqqggdy9LHXZutJHIj7xbJPUAyL
-
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsImVtYWlsIjoiYW5naWVAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY0MDI1NDUzLCJleHAiOjE3NjQxMTE4NTN9.zy7y5Dp643lFQbae1pRL4UvJhI_6mtxaAa_k_cwyXzE
+@sessionId = cs_test_a1ZreLJvCsLjUVbfKOL9L2JAj13aIctIsEWHGwrWTyzaRuketVBtqLyZa0
 ### Crear sesión de pago
 POST {{baseUrl}}/payments/stripe/checkout
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "orderId": 6
+    "orderId": 7
 }
 
 ### Verificar Estado de Pago

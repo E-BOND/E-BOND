@@ -11,12 +11,6 @@ import { Order } from '../../order/entities/order.entity';
 import { Cart } from '../../cart/entities/cart.entity';
 import { Role } from '../../role/entities/role.entity';
 
-// Enum de roles de usuario
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  CLIENT = 'CLIENT',
-}
-
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()

@@ -25,7 +25,6 @@ import { CreatePaymentDto } from './dtos/create-payment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../user/entities/user.entity';
 import { UpdatePaymentDto } from './dtos/update-payment.dto';
 
 @Controller('payments')
@@ -74,7 +73,7 @@ export class PaymentController {
     // ============================
     // VER TODOS LOS PAGOS (ADMIN)
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Get()
     findAll() {
         return this.paymentService.findAll();
@@ -91,7 +90,7 @@ export class PaymentController {
     // ============================
     // ACTUALIZAR PAGO (ADMIN)
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Patch(':id')
     update(
         @Param('id', ParseIntPipe) id: number,
@@ -103,7 +102,7 @@ export class PaymentController {
     // ============================
     // ELIMINAR PAGO (ADMIN)
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.paymentService.remove(id);

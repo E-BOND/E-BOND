@@ -16,7 +16,6 @@ import { UpdateOrderDto } from './dtos/update-order.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../user/entities/user.entity';
 import { OrderStatus } from './entities/order.entity';
 
 @Controller('orders')
@@ -27,7 +26,7 @@ export class OrderController {
     // ============================
     // OBTENER TODAS LAS ÓRDENES (SOLO ADMIN)
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Get()
     findAll() {
         return this.orderService.findAll();
@@ -80,7 +79,7 @@ export class OrderController {
     // ============================
     // ACTUALIZAR ORDEN (SOLO ADMIN)
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Patch(':id')
     update(
         @Param('id', ParseIntPipe) id: number,
@@ -113,7 +112,7 @@ export class OrderController {
     // ============================
     // ELIMINAR ORDEN (SOLO ADMIN)
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.orderService.remove(id);

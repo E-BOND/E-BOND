@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ProductService } from '../product/product.service';
-import { OrderService } from '../order/order.service';
-import { PaymentMethodService } from '../pay-methods/pay-method.service';
+// Asumo que tienes estos servicios en estas rutas
+import { ProductService } from '../product/product.service'; 
+import { OrderService } from '../order/order.service'; 
+import { PaymentMethodService } from '../pay-methods/pay-method.service'; 
 
 @Injectable()
 export class ChatService {
@@ -11,215 +12,211 @@ export class ChatService {
         private readonly paymentMethodService: PaymentMethodService,
     ) {}
 
-    // ============================================================
-    // 🔍 MÉTODO CENTRAL DE BÚSQUEDA (LOCAL → EXTERNO)
-    // ============================================================
-
-    private async hybridProductSearch(query: string) {
-        // 1️⃣ Buscar primero en la base local
-        const localProducts = await this.productService.getLocalProducts();
-        const foundLocal = localProducts.find(p =>
-            p.name.toLowerCase().includes(query.toLowerCase()),
-        );
-
-        if (foundLocal) return { product: foundLocal, source: 'local' };
-
-        // 2️⃣ Si no existe local, buscar externo
-        const external = await this.productService.searchExternalTechProducts(query);
-
-        if (external.total > 0) {
-            const ext = external.results[0]; // Tomamos el primer match
-            return {
-                product: {
-                    id: ext.id,
-                    name: ext.title,
-                    description: ext.description,
-                    price: ext.price,
-                    imageUrl: ext.thumbnail,
-                    cantidad: ext.stock ?? 0,
-                    available: ext.stock > 0,
-                },
-                source: 'external',
-            };
-        }
-
-        return { product: null, source: 'none' };
-    }
-
-    // ============================================================
-    // 🔧 FUNCIÓN FAKE PARA STOCK LOCAL/EXTERNO
-    // ============================================================
-
-    private async getStockInfo(product: any) {
-        return {
-            available: product.cantidad > 0,
-            quantity: product.cantidad,
-        };
-    }
-
-    // ============================================================
-    // 🔧 FUNCIÓN FAKE DE RECOMENDACIONES
-    // ============================================================
-
-    private async getRecommendations(productId: number, customerId: string) {
-        const products = await this.productService.getLocalProducts();
-        
-        return products
-            .filter(p => p.id !== productId)
-            .slice(0, 5);
-    }
-
-    // ============================================================
-    // 🔧 FUNCIÓN FAKE DE GARANTÍA
-    // ============================================================
-
-    private async getWarrantyInfo(productId: number) {
-        return {
-            duration: '12 meses',
-            type: 'Garantía oficial del fabricante',
-        };
-    }
-
-    // ============================================================
-    // 🟦 CONSULTAR DISPONIBILIDAD
-    // ============================================================
+    
 
     async checkProductAvailability(productQuery: string, customerId: string) {
-        const { product, source } = await this.hybridProductSearch(productQuery);
 
-        if (!product) {
-            return {
-                available: false,
-                message: `No pude encontrar el producto **"${productQuery}"**.`,
-            };
-        }
+        const productDetail = await this.productService.searchLocalProductDetails(productQuery); 
 
-        const stockInfo = await this.getStockInfo(product);
-        const recommendations = await this.getRecommendations(product.id, customerId);
+        if (productDetail) {
 
+        const stockQuantity = productDetail.cantidad; 
+        // La disponibilidad depende de la bandera 'available' y de que haya stock > 0
+        const isAvailable = productDetail.available && stockQuantity > 0;
+
+        return { 
+                available: isAvailable, 
+                message: `El producto "${productDetail.name}" está ${isAvailable ? 'en stock' : 'agotado'}.`, 
+                product: { 
+                name: productDetail.name, 
+                price: productDetail.price, 
+                description: productDetail.description,
+                available: isAvailable,
+                stock: { 
+                    quantity: stockQuantity, 
+                    lowStock: stockQuantity < 5 
+                },
+            } 
+    };
+    } else {
         return {
-            available: stockInfo.available,
-            source,
-            product,
-            stock: stockInfo,
-            message: stockInfo.available
-                ? `Sí, **${product.name}** está disponible 🙌. Quedan **${stockInfo.quantity}** unidades.`
-                : `Actualmente **${product.name}** está agotado 😞`,
-            recommendations: recommendations.slice(0, 3),
-        };
+            available: false,
+            message: `Lo siento, no se encontró **en nuestro inventario** ningún producto relacionado con "${productQuery}".`,
+            product: null,
+    };
     }
-
-    // ============================================================
-    // 🟦 COMPARAR PRODUCTOS
-    // ============================================================
+}
 
     async compareProducts(productQueries: string[]) {
-        const searchResults = await Promise.all(
-            productQueries.map(q => this.hybridProductSearch(q)),
+    if (!productQueries || productQueries.length < 2) {
+        return { success: false, message: 'Necesitas al menos dos productos para comparar.' };
+    }
+
+    const foundProducts = await this.productService.searchMultipleLocalProducts(productQueries);
+    
+    
+    const comparisonResults = productQueries.map((query) => {
+        const productDetail = foundProducts.find(p => 
+            p.name.toLowerCase().includes(query.toLowerCase()) || 
+            p.description.toLowerCase().includes(query.toLowerCase())
         );
 
-        const valid = searchResults.filter(res => res.product !== null);
-
-        if (valid.length < 2) {
+        if (productDetail) {
+            const stockQuantity = productDetail.cantidad;
+            const isAvailable = productDetail.available && stockQuantity > 0;
+            const numericPrice = parseFloat(String(productDetail.price ?? '0'));
+            const price = isNaN(numericPrice) || numericPrice === 0 ? 'N/A' : numericPrice.toFixed(2);
             return {
-                success: false,
-                message: 'Necesito al menos **dos productos** válidos para comparar.',
+                name: productDetail.name,
+                price: price,
+                available: isAvailable,
+                categories: productDetail.categories.map(c => c.name).join(', ') || 'N/A',
+                // Bandera interna para saber si el producto fue encontrado y es real
+                isReal: true, 
+            };
+        } else {
+            return {
+                name: query, 
+                price: 'N/A',
+                available: false,
+                categories: 'N/A',
+                isReal: false, // No encontrado
             };
         }
+    });
+    const realProductsCount = comparisonResults.filter(p => p.isReal).length;
 
-        return {
-            success: true,
-            message: `Aquí tienes la comparación entre ${valid.length} productos 👇`,
-            products: valid.map(v => v.product),
+    if (realProductsCount < 2) {
+        // Si no se encontraron DOS productos válidos (realProductsCount es 0 o 1)
+        const notFoundQueries = comparisonResults.filter(p => !p.isReal).map(p => `"${p.name}"`).join(', ');
+        
+        const message = realProductsCount === 0 
+            ? 'Lo sentimos, no pudimos encontrar **ninguno** de los productos solicitados en nuestro inventario. Por favor, asegúrate de que ambos productos existan.'
+            : `Solo pudimos encontrar **${comparisonResults.find(p => p.isReal)?.name}**. No podemos compararlo con ${notFoundQueries}. Por favor, **ingresa un segundo producto disponible** para poder realizar la comparación.`;
+
+        // Devuelve el mensaje de error SIN la estructura de comparación (data.products)
+        return { 
+            success: false, 
+            message: message,
         };
     }
+    const finalMessage = 'Aquí tienes la comparación de los productos disponibles en nuestro inventario.';
 
-    // ============================================================
-    // 🟦 OBTENER INFORMACIÓN DE GARANTÍA
-    // ============================================================
-
+    // Antes de enviar, eliminamos la bandera 'isReal' para el cliente
+    const productsToSend = comparisonResults.map(({ isReal, ...rest }) => rest);
+    
+    return { 
+        success: true, 
+        message: finalMessage, 
+        products: productsToSend
+    };
+}
     async getWarrantyInfoForChat(productQuery: string) {
-        const { product } = await this.hybridProductSearch(productQuery);
-
-        if (!product) {
-            return {
-                found: false,
-                message: `No encontré el producto **"${productQuery}"**.`,
-            };
-        }
-
-        const warranty = await this.getWarrantyInfo(product.id);
-
-        return {
-            found: true,
-            product: product.name,
-            warranty,
-            message: `🛡️ La garantía de **${product.name}** es: **${warranty.duration}**, tipo **${warranty.type}**.`,
-        };
+        return { found: true, message: `La garantía del ${productQuery} es de 1 año.`, warranty: { duration: '1 año' } };
     }
-
-    // ============================================================
-    // 💳 MÉTODOS DE PAGO
-    // ============================================================
 
     async getPaymentMethodsInfo() {
-        const methods = await this.paymentMethodService.getAvailablePaymentMethods();
-
-        return {
-            methods,
-            message: `💳 Disponemos de **${methods.length} métodos de pago**. Puedes elegir el que prefieras 😊`,
-            
-            securityInfo: {
-                encrypted: true,
-                fraudProtection: true,
-                moneyBackGuarantee: true,
-                sslCertified: true
-            }
-        };
+        const methods = [
+            { name: 'Visa/Mastercard', description: 'Aceptamos todas las tarjetas.' },
+            { name: 'PayPal', description: 'Pago seguro online.' }
+        ];
+        return { methods, message: 'Métodos de pago disponibles.', securityInfo: { encrypted: true } };
     }
 
-    // ============================================================
-    // 📦 HISTORIAL DE PEDIDOS
-    // ============================================================
+ // ===========================================
+// MÉTODO CORREGIDO: getCustomerOrderHistory
+// ===========================================
+async getCustomerOrderHistory(customerId: string) {
+    // 1. Convertir el ID de string (del JWT) a number
+    const userId = parseInt(customerId, 10);
+    
+    if (isNaN(userId)) {
+        return this.formatEmptyHistory('Error: ID de usuario no válido.');
+    }
 
-    private calculateFavoriteCategory(orders: any[]): string {
-        if (!orders || orders.length === 0) return 'Sin compras';
+    try {
+        // 2. Obtener la historia de OrderService. (Asumimos que carga las categorías)
+        const orders = await this.orderService.getUserOrderHistory(userId);
+        
+        if (orders.length === 0) {
+            return this.formatEmptyHistory();
+        }
 
-        const counts: Record<string, number> = {};
+        // 3. Procesar y calcular estadísticas
+        let totalSpent = 0;
+        const categoryCounts: { [category: string]: number } = {};
 
         for (const order of orders) {
-            for (const detail of order.details ?? []) {
-                for (const category of detail.product?.categories ?? []) {
-                    counts[category.name] = (counts[category.name] || 0) + 1;
+            // 🚨 CORRECCIÓN CLAVE: Usamos Number() para asegurar que order.total 
+            // se convierte a un número antes de sumarse, evitando el TypeError.
+            totalSpent += Number(order.total);
+            
+            // Recorrer detalles para calcular la categoría favorita
+            if (order.details) {
+                for (const detail of order.details) {
+                    
+                    // LÓGICA DE CATEGORÍAS (M:M): Iteramos sobre el array 'categories'
+                    if (detail.product?.categories?.length) { 
+                        for (const category of detail.product.categories) {
+                            // Usamos 'name' como lo tenías en el código.
+                            const categoryName = category.name || 'Otros';
+                            // Sumamos la cantidad vendida al contador de esa categoría
+                            categoryCounts[categoryName] = (categoryCounts[categoryName] || 0) + detail.quantity;
+                        }
+                    } else {
+                        // Si un producto no tiene categorías asignadas
+                        categoryCounts['Sin Categorizar'] = (categoryCounts['Sin Categorizar'] || 0) + detail.quantity;
+                    }
                 }
             }
         }
 
-        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+        // 4. Encontrar la categoría favorita
+        let favoriteCategory = 'Sin Compras';
+        let maxQuantity = 0;
 
-        return sorted[0]?.[0] ?? 'Sin categoría';
-    }
-
-
-    async getCustomerOrderHistory(customerId: string) {
-        const orders = await this.orderService.getUserOrderHistory(Number(customerId));
-
-        if (!orders.length) {
-            return {
-                totalOrders: 0,
-                totalSpent: 0,
-                recentOrders: [],
-                favoriteCategory: 'Sin compras',
-                message: 'Aún no tienes pedidos registrados.',
-            };
+        for (const category in categoryCounts) {
+            if (categoryCounts[category] > maxQuantity) {
+                maxQuantity = categoryCounts[category];
+                favoriteCategory = category;
+            }
         }
-
+        
+        // 5. Formatear y retornar la respuesta
         return {
+            message: `¡Encontré **${orders.length} pedidos**! Aquí está tu resumen.`,
             totalOrders: orders.length,
-            totalSpent: orders.reduce((sum, order) => sum + Number(order.total), 0),
-            recentOrders: orders.slice(0, 5),
-            favoriteCategory: this.calculateFavoriteCategory(orders),
-            message: `Tienes **${orders.length} pedidos** en tu historial 📦`,
+            // totalSpent ahora es un número garantizado, toFixed funciona.
+            totalSpent: totalSpent.toFixed(2), 
+            // Solo retornamos los datos básicos de los últimos 3 pedidos
+            recentOrders: orders.slice(0, 3).map(o => ({ 
+                id: o.id, 
+                // Aseguramos que el total en la respuesta también se formatee correctamente.
+                total: Number(o.total).toFixed(2), 
+                status: o.status 
+            })), 
+            favoriteCategory: favoriteCategory,
         };
+
+    } catch (error) {
+        // Este error ya no debería ser por totalSpent, sino por un problema en la DB
+        console.error('Error al obtener historial de órdenes:', error);
+        return this.formatEmptyHistory('Hubo un error interno al consultar el historial.');
     }
+}
+
+// ===========================================
+// MÉTODO AUXILIAR
+// ===========================================
+
+private formatEmptyHistory(customMessage?: string) {
+    return {
+        message: customMessage || 'Aún no tienes pedidos registrados.',
+        totalOrders: 0,
+        // 🚨 CORREGIDO: Debe ser el número 0
+        totalSpent: 0, 
+        recentOrders: [],
+        favoriteCategory: 'Sin compras',
+    };
+}
 }
