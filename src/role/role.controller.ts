@@ -24,7 +24,8 @@ import {
     ApiBearerAuth, 
     ApiOperation, 
     ApiParam, 
-    ApiBody 
+    ApiBody,
+    ApiQuery,
 } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dtos/create-role.dto';
@@ -46,8 +47,14 @@ export class RoleController {
     /**
      * Obtiene la lista completa de roles registrados.
      */
+    @Roles('ADMIN')
     @Get()
     @ApiOperation({ summary: 'Listar todos los roles' })
+     @ApiQuery({
+        name: 'token',
+        required: true,
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+      })
     findAll() {
         return this.roleService.findAll();
     }

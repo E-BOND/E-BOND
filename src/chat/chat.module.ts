@@ -9,7 +9,6 @@ import { PaymentMethodModule } from '../pay-methods/pay-method.module';
 
 @Module({
     imports: [
-        // ✅ Usar el MISMO secreto que AuthModule
         JwtModule.registerAsync({
             imports: [ConfigModule],
             useFactory: async (configService: ConfigService) => {
@@ -22,7 +21,7 @@ import { PaymentMethodModule } from '../pay-methods/pay-method.module';
                 return {
                     secret,
                     signOptions: { 
-                        expiresIn: '1d'
+                        expiresIn: configService.get<number>('JWT_EXPIRES_IN') || '1d',
                     },
                 };
             },

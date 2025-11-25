@@ -5,9 +5,11 @@ import { Product } from './entities/product.entity';
 import { Category } from '../category/entities/category.entity';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ProductService {
+    private readonly externalApiUrl: string;
     constructor(
         @InjectRepository(Product)
         private readonly productRepository: Repository<Product>,
@@ -16,7 +18,13 @@ export class ProductService {
         private readonly categoryRepository: Repository<Category>,
 
         private readonly httpService: HttpService,
-    ) {}
+
+        private readonly configService: ConfigService,
+    ) {
+        this.externalApiUrl = this.configService.get<string>(
+            'EXTERNAL_PRODUCTS_API_URL'
+        )!;
+    }
 
     // ===========================
     // OBTENER productos tech externos
@@ -30,7 +38,7 @@ export class ProductService {
 
             while (true) {
             const resp$ = this.httpService.get(
-                `https://dummyjson.com/products?limit=${limit}&skip=${skip}`,
+                `${this.externalApiUrl}?limit=${limit}&skip=${skip}`,
             );
             const response = await firstValueFrom(resp$);
             const data = response.data;
@@ -66,7 +74,7 @@ export class ProductService {
     async searchExternalTechProducts(query: string) {
         try {
         const resp$ = this.httpService.get(
-            `https://dummyjson.com/products/search?q=${encodeURIComponent(query)}`,
+            `${this.externalApiUrl}/search?q=${encodeURIComponent(query)}`,
         );
         const response = await firstValueFrom(resp$);
         const data = response.data;

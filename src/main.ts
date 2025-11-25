@@ -4,11 +4,15 @@ import { ValidationPipe } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+
 
 async function bootstrap() {
+    
     const app = await NestFactory.create(AppModule, {
         bodyParser: false,
     });
+    
 
     // --- Raw Body para Webhooks ---
     app.use(
@@ -25,13 +29,6 @@ async function bootstrap() {
     // --- WebSockets ---
     app.useWebSocketAdapter(new IoAdapter(app));
 
-    // --- CORS ---
-    app.enableCors({
-        origin: '*',
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        credentials: true,
-    });
-
     // --- Validation Pipes ---
     app.useGlobalPipes(new ValidationPipe({
         whitelist: true,
@@ -39,6 +36,14 @@ async function bootstrap() {
         transform: true,
     }));
 
+    const configService = app.get(ConfigService);
+
+      // --- CORS ---
+    app.enableCors({
+        origin: configService.get<string>('CORS_ORIGIN', '*'),
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        credentials: true,
+    });
     // ==============================
     // 📌 Swagger Config
     // ==============================
@@ -52,7 +57,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);
 
-    const port = process.env.PORT ?? 3000;
+    const port = configService.get<number>('PORT') || 3000;
     await app.listen(port);
 
     console.log(`🚀 Servidor ejecutándose en http://localhost:${port}`);

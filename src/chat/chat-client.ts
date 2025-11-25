@@ -1,8 +1,12 @@
 import io from 'socket.io-client';
 import * as readline from 'readline';
 
-const TEST_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsImVtYWlsIjoiYW5naWVAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY0MDI1NDUzLCJleHAiOjE3NjQxMTE4NTN9.zy7y5Dp643lFQbae1pRL4UvJhI_6mtxaAa_k_cwyXzE';
-const SERVER_URL = 'http://localhost:3000/ecommerce-chat';
+const TEST_TOKEN = process.env.CLIENT_TEST_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsImVtYWlsIjoiYW5naWVAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY0MDI1NDUzLCJleHAiOjE3NjQxMTE4NTN9.zy7y5Dp643lFQbae1pRL4UvJhI_6mtxaAa_k_cwyXzE';
+
+const HOST = process.env.HOST || 'http://localhost';
+const PORT = process.env.PORT || '3000';
+const CHAT_NAMESPACE = process.env.CHAT_NAMESPACE || '/ecommerce-chat'; 
+const SERVER_URL = `${HOST}:${PORT}${CHAT_NAMESPACE}`;
 
 class InteractiveChatClient {
     private socket;

@@ -23,9 +23,11 @@ interface ChatContext {
     comparisonProducts?: string[];
 }
 
+const CHAT_CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
+const CHAT_NAMESPACE = process.env.CHAT_NAMESPACE || '/ecommerce-chat';
 @WebSocketGateway({
-    cors: { origin: '*' },
-    namespace: '/ecommerce-chat'
+    cors: { origin: CHAT_CORS_ORIGIN },
+    namespace: CHAT_NAMESPACE
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly logger = new Logger(ChatGateway.name);

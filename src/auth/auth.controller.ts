@@ -59,8 +59,10 @@ export class AuthController {
       ejemplo: {
         summary: 'Registro exitoso',
         value: {
-          name: 'Diosa Pérez',
+          nombre: 'Diosa',
+          apellido: 'Pérez',
           email: 'Diosa@gmail.com',
+          telefono: '30463634447',
           password: 'MiClaveSegura123',
         },
       },
