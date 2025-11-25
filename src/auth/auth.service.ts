@@ -18,7 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
     private mailService: MailService,
     private readonly roleService: RoleService,
-    private configService: ConfigService, // AGREGAR ESTO
+    private configService: ConfigService,
   ) {}
 
   private addHours(date: Date, hours: number) {

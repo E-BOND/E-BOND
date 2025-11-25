@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { User } from '../user/entities/user.entity';
 import { MailModule } from './mail/mail.module';
-import { JwtStrategy } from './providers/jwt.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import { RoleModule } from '../role/role.module';
 
 @Module({
@@ -24,7 +24,7 @@ import { RoleModule } from '../role/role.module';
         return {
           secret,
           signOptions: { 
-            expiresIn: '1d'
+            expiresIn: configService.get<number>('JWT_EXPIRES_IN') || '1d',
           },
         };
       },

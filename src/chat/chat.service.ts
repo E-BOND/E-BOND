@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-// Asumo que tienes estos servicios en estas rutas
 import { ProductService } from '../product/product.service'; 
 import { OrderService } from '../order/order.service'; 
 import { PaymentMethodService } from '../pay-methods/pay-method.service'; 
@@ -124,7 +123,7 @@ export class ChatService {
     }
 
  // ===========================================
-// MÉTODO CORREGIDO: getCustomerOrderHistory
+//  getCustomerOrderHistory
 // ===========================================
 async getCustomerOrderHistory(customerId: string) {
     // 1. Convertir el ID de string (del JWT) a number
@@ -147,7 +146,6 @@ async getCustomerOrderHistory(customerId: string) {
         const categoryCounts: { [category: string]: number } = {};
 
         for (const order of orders) {
-            // 🚨 CORRECCIÓN CLAVE: Usamos Number() para asegurar que order.total 
             // se convierte a un número antes de sumarse, evitando el TypeError.
             totalSpent += Number(order.total);
             
@@ -213,7 +211,6 @@ private formatEmptyHistory(customMessage?: string) {
     return {
         message: customMessage || 'Aún no tienes pedidos registrados.',
         totalOrders: 0,
-        // 🚨 CORREGIDO: Debe ser el número 0
         totalSpent: 0, 
         recentOrders: [],
         favoriteCategory: 'Sin compras',

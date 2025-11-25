@@ -1,3 +1,15 @@
+/**
+ * Controlador responsable de gestionar los usuarios del sistema.
+ *
+ * Funcionalidades:
+ * - Obtener el perfil del usuario autenticado
+ * - Listar usuarios (ADMIN)
+ * - Consultar usuario por ID (ADMIN)
+ * - Crear usuarios (público o según flujo definido)
+ * - Actualizar perfil del usuario autenticado
+ * - Actualizar cualquier usuario (ADMIN)
+ * - Eliminar usuarios (ADMIN)
+ */
 import {
     Controller,
     Get,
@@ -8,14 +20,21 @@ import {
     Request,
     ForbiddenException,
     Post,
-    Delete
+    Delete,
+    ParseIntPipe,
 } from '@nestjs/common';
+import { 
+    ApiBearerAuth, 
+    ApiTags, 
+    ApiOperation, 
+    ApiParam, 
+    ApiBody,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { Public } from '../auth/decorators/public.decorator';
 
@@ -26,53 +45,114 @@ import { Public } from '../auth/decorators/public.decorator';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    /** Obtener datos del usuario autenticado */
+    // ============================================================
+    // GET /users/profile  (Usuario autenticado)
+    // ============================================================
+    /**
+     * Obtiene la información completa del usuario autenticado.
+     */
     @Get('profile')
+    @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
     async getProfile(@Request() req: any) {
         const user = await this.userService.findOne(req.user.userId);
-        if (!user) throw new ForbiddenException('Usuario no encontrado');
+
+        if (!user) {
+            throw new ForbiddenException('Usuario no encontrado');
+        }
+
         return user;
     }
 
-    /** Obtener todos los usuarios (solo ADMIN) */
+    // ============================================================
+    // GET /users  (ADMIN)
+    // ============================================================
+    /**
+     * Obtiene la lista completa de usuarios.
+     *
+     * Solo disponible para administradores.
+     */
     @Get()
     @Roles('ADMIN')
+    @ApiOperation({ summary: 'Listar todos los usuarios (ADMIN)' })
     async findAll() {
         return this.userService.findAll();
     }
 
-    /** Obtener usuario por ID (solo ADMIN) */
+    // ============================================================
+    // GET /users/:id  (ADMIN)
+    // ============================================================
+    /**
+     * Obtiene un usuario por su ID.
+     *
+     * Solo disponible para administradores.
+     */
     @Get(':id')
     @Roles('ADMIN')
-    async findOne(@Param('id') id: number) {
+    @ApiOperation({ summary: 'Obtener un usuario por ID (ADMIN)' })
+    @ApiParam({ name: 'id', type: Number })
+    async findOne(@Param('id', ParseIntPipe) id: number) {
         return this.userService.findOne(id);
     }
 
-    /**  Crear usuario (solo ADMIN) */
+    // ============================================================
+    // POST /users  (PÚBLICO)
+    // ============================================================
+    /**
+     * Crea un nuevo usuario en el sistema.
+     *
+     * Este endpoint es público según diseño.
+     */
     @Post()
     @Public()
+    @ApiOperation({ summary: 'Registrar un nuevo usuario (PUBLIC)' })
+    @ApiBody({ type: CreateUserDto })
     async create(@Body() dto: CreateUserDto) {
         return this.userService.create(dto);
     }
-    
 
-
-
-    /** Actualizar datos del usuario autenticado */
+    // ============================================================
+    // PATCH /users/update  (Usuario autenticado)
+    // ============================================================
+    /**
+     * Actualiza los datos del usuario autenticado.
+     */
     @Patch('update')
+    @ApiOperation({ summary: 'Actualizar perfil del usuario autenticado' })
+    @ApiBody({ type: UpdateUserDto })
     async updateProfile(@Request() req: any, @Body() dto: UpdateUserDto) {
         return this.userService.update(req.user.userId, dto);
     }
 
+    // ============================================================
+    // PATCH /users/:id  (ADMIN)
+    // ============================================================
+    /**
+     * Actualiza un usuario específico por ID.
+     *
+     * Solo disponible para administradores.
+     */
     @Patch(':id')
     @Roles('ADMIN')
-    async update(@Param('id') id: number, @Body() dto: UpdateUserDto) {
+    @ApiOperation({ summary: 'Actualizar un usuario (ADMIN)' })
+    @ApiParam({ name: 'id', type: Number })
+    @ApiBody({ type: UpdateUserDto })
+    async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
         return this.userService.update(id, dto);
     }
 
+    // ============================================================
+    // DELETE /users/:id  (ADMIN)
+    // ============================================================
+    /**
+     * Elimina un usuario del sistema por ID.
+     *
+     * Solo disponible para administradores.
+     */
     @Delete(':id')
     @Roles('ADMIN')
-    async delete(@Param('id') id: number) {
+    @ApiOperation({ summary: 'Eliminar un usuario por ID (ADMIN)' })
+    @ApiParam({ name: 'id', type: Number })
+    async delete(@Param('id', ParseIntPipe) id: number) {
         return this.userService.delete(id);
     }
 }

@@ -9,8 +9,8 @@ export class MailService {
 
     constructor(private configService: ConfigService) {
         this.transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
+            host: this.configService.get<string>('MAIL_HOST'),
+            port: this.configService.get<number>('MAIL_PORT'),
             secure: false, // TLS
             auth: {
                 user: this.configService.get<string>('MAIL_USER'),
@@ -40,7 +40,7 @@ export class MailService {
     <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; text-align: center;">
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
             <tr>
-                <td align="center" style="padding: 25px 0; background-color: #3f51b5; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                <td align="center" style="padding: 25px 0; background-color: #6879dcff; border-top-left-radius: 8px; border-top-right-radius: 8px;">
                     <h1 style="color: #ffffff; margin: 0; font-size: 28px;">E-BOND 🛍️</h1>
                 </td>
             </tr>
@@ -88,7 +88,7 @@ async sendPasswordResetEmail(to: string, token: string) {
     <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; text-align: center;">
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
             <tr>
-                <td align="center" style="padding: 25px 0; background-color: #f7931e; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                <td align="center" style="padding: 25px 0; background-color: #060952ff; border-top-left-radius: 8px; border-top-right-radius: 8px;">
                     <h1 style="color: #ffffff; margin: 0; font-size: 28px;">Restablecer Contraseña</h1>
                 </td>
             </tr>
@@ -100,8 +100,8 @@ async sendPasswordResetEmail(to: string, token: string) {
                     
                     <table border="0" cellspacing="0" cellpadding="0" style="margin: 30px auto;">
                         <tr>
-                            <td align="center" style="border-radius: 6px;" bgcolor="#f7931e">
-                                <a href="${link}" target="_blank" style="font-size: 18px; font-family: Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 6px; padding: 14px 30px; border: 1px solid #f7931e; display: inline-block; font-weight: bold;">
+                            <td align="center" style="border-radius: 6px;" bgcolor="#28a745">
+                                <a href="${link}" target="_blank" style="font-size: 18px; font-family: Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 6px; padding: 14px 30px; border: 1px solid #28a745; display: inline-block; font-weight: bold;">
                                     Restablecer Contraseña
                                 </a>
                             </td>
@@ -109,7 +109,7 @@ async sendPasswordResetEmail(to: string, token: string) {
                     </table>
 
                     <p style="color: #555555; line-height: 1.6; font-size: 14px;">Si el botón no funciona, copia y pega el siguiente enlace:</p>
-                    <p style="color: #f7931e; font-size: 13px; word-break: break-all; padding: 10px; background-color: #f0f0f0; border-radius: 4px;">${link}</p>
+                    <p style="color: #000000ff; font-size: 13px; word-break: break-all; padding: 10px; background-color: #f0f0f0; border-radius: 4px;">${link}</p>
                 </td>
             </tr>
             <tr>

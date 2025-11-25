@@ -8,6 +8,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService) {
     const secret = configService.get<string>('JWT_SECRET');
     
+    // Validar ANTES de pasar al super()
+    if (!secret) {
+      throw new Error('JWT_SECRET no está definido en las variables de entorno');
+    }
+    
     console.log('--- SECRETO EN JWT STRATEGY:', secret);
     
     super({

@@ -6,11 +6,11 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "nombre": "Yuleibis",
-    "apellido": "Armenta",
-    "email": "angiecabal35@gmail.com",
+    "nombre": "Maria",
+    "apellido": "Patricia",
+    "email": "yuleibisnoemiarmentacruz@gmail.com",
     "telefono": "30463634447",
-    "password": "1111111"
+    "password": "987654321"
 
 }
 
@@ -20,11 +20,11 @@ Content-Type: application/json
 Authorization: Bearer {{token}} 
 
 {
-    "nombre": "Nuevo",
-    "apellido": "Administrador",
-    "email": "nuevo.admin@empresa.com",
+    "nombre": "Yuleibis",
+    "apellido": "Armenta",
+    "email": "luly09022006@gmail.com",
     "telefono": "30463634447",
-    "password": "1111111",
+    "password": "123456789",
     "roleId": 1
 }
 
@@ -33,8 +33,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "angie@gmail.com",
-    "password": "1111111"
+    "email": "luly09022006@gmail.com",
+    "password": "123456789"
 }
 
 ### Listar todos los usuarios (solo admin)
