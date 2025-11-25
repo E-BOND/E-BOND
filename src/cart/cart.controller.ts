@@ -14,7 +14,7 @@ import { CartService } from './cart.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../user/entities/user.entity';
+
 import { AddCartItemDto } from './dtos/add-cart-item.dto';
 
 @Controller('carts')
@@ -63,17 +63,16 @@ export class CartController {
     // ============================
     // 5. FIND ALL (ADMIN): GET /carts
     // ============================
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Get()
     findAll() {
         return this.cartService.findAll();
     }
-    
     // ============================
     // 5. FIND ONE (ADMIN): GET /carts/:id
     // ============================
     // Opcional: Obtener un carrito por ID (solo ADMIN)
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.cartService.findOne(id);

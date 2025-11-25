@@ -15,7 +15,7 @@ import { UpdateInvoiceDto } from './dtos/update-invoice.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../user/entities/user.entity';
+
 
 @Controller('invoices')
 // Aplicamos guards a nivel de controlador. Asumimos que la creación es ADMIN/INTERNAL.
@@ -26,7 +26,7 @@ export class InvoiceController {
     // ------------------------------------
     // GET /invoices (ADMIN)
     // ------------------------------------
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Get()
     findAll() {
         return this.invoiceService.findAll();
@@ -46,7 +46,7 @@ export class InvoiceController {
     // POST /invoices (ADMIN / INTERNAL)
     // La facturación es un proceso interno que sigue al pago.
     // ------------------------------------
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Post()
     create(@Body() dto: CreateInvoiceDto) {
         return this.invoiceService.create(dto);
@@ -55,7 +55,7 @@ export class InvoiceController {
     // ------------------------------------
     // PATCH /invoices/:id (ADMIN)
     // ------------------------------------
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Patch(':id')
     update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateInvoiceDto) {
         return this.invoiceService.update(id, dto);
@@ -64,7 +64,7 @@ export class InvoiceController {
     // ------------------------------------
     // PATCH /invoices/:id/cancel (ADMIN)
     // ------------------------------------
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Patch(':id/cancel')
     cancel(@Param('id', ParseIntPipe) id: number) {
         return this.invoiceService.cancel(id);
@@ -73,7 +73,7 @@ export class InvoiceController {
     // ------------------------------------
     // DELETE /invoices/:id (ADMIN)
     // ------------------------------------
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.invoiceService.remove(id);

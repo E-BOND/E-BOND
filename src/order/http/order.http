@@ -1,4 +1,5 @@
 @baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsImVtYWlsIjoiYW5naWVAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY0MDI1NDUzLCJleHAiOjE3NjQxMTE4NTN9.zy7y5Dp643lFQbae1pRL4UvJhI_6mtxaAa_k_cwyXzE
 // Token Usuario Cliente
 //@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMzLCJlbWFpbCI6Inl1bGVpYmlzbm9lbWlhcm1lbnRhY3J1ekBnbWFpbC5jb20iLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzYzNzc3NDIwLCJleHAiOjE3NjM4NjM4MjB9.hWkm5EiR-g_gOn1WBHzY6X2NIWkPiWNZ-nKgdEseX_A
 // Token Usuario Admin (Para las dos últimas pruebas debe ser admintoken)
@@ -13,7 +14,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "cartId": 1
+    "cartId": 5
 }
 
 
@@ -23,7 +24,7 @@ Authorization: Bearer {{token}}
 
 
 ### Ver Mi Orden Específica by ID
-GET {{baseUrl}}/orders/1
+GET {{baseUrl}}/orders/7
 Authorization: Bearer {{token}}
 
 

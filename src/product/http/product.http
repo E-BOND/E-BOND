@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMxLCJlbWFpbCI6Imx1bHkwOTAyMjAwNkBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjM3NzY3NDAsImV4cCI6MTc2Mzg2MzE0MH0.pSGaL2_KlUyDJTEfPc1_9tgKEnvEW5cTYt9_zroKjC8
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsImVtYWlsIjoiYW5naWVAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY0MDI1NDUzLCJleHAiOjE3NjQxMTE4NTN9.zy7y5Dp643lFQbae1pRL4UvJhI_6mtxaAa_k_cwyXzE
 
 ### 1. OBTENER todos los productos tech desde DummyJSON
 GET {{baseUrl}}/products/external/tech
@@ -23,7 +23,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "categoryIds": [1]
+    "categoryIds": [1, 2]
 }
 
 ### 4. OBTENER productos LOCALES ya guardados en la base de datos
@@ -31,5 +31,5 @@ GET {{baseUrl}}/products/local
 Authorization: Bearer {{token}}
 
 ### 5. OBTENER un producto local por ID (CORRECTO)
-GET {{baseUrl}}/products/local/by-id?id=47
+GET {{baseUrl}}/products/local/by-id?id=10
 Authorization: Bearer {{token}}

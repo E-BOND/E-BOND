@@ -1,7 +1,7 @@
 import io from 'socket.io-client';
 import * as readline from 'readline';
 
-const TEST_TOKEN = 'AQUÍ_DEBE_IR_TOKEN_JWT_VALIDO'; 
+const TEST_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsImVtYWlsIjoiYW5naWVAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY0MDI1NDUzLCJleHAiOjE3NjQxMTE4NTN9.zy7y5Dp643lFQbae1pRL4UvJhI_6mtxaAa_k_cwyXzE';
 const SERVER_URL = 'http://localhost:3000/ecommerce-chat';
 
 class InteractiveChatClient {
@@ -25,7 +25,6 @@ class InteractiveChatClient {
         });
 
         this.setupEventListeners();
-        // ❌ Eliminamos setupUserInput() para control manual
         this.rl.on('line', this.handleInput.bind(this));
     }
 
@@ -35,14 +34,14 @@ class InteractiveChatClient {
             console.log(`✅ Bienvenido a E-BOND tu tienda virtual de confianza\n`);
             console.log(` ¡Conectamos personas, productos y experiencias en tiempo real!\n`);
             console.log(`
-                _______            ________ ________ ________  ________
-                |\\ ___ \\            |\\ __ \\|\\ __ \\|\\ ___ \\|\\ ___ \\  
-                \\ \\ __/| ____________\\ \\ \\|\\ /\\ \\ \\ \\|\\ \\ \\ \\ \\ \\ \\ \\ \\ _|\\ \\ 
-                  \\ \\ \\_|/__|\\____________\\ \\ \\ __ \\ \\ __ \\ \\ \\ \\ \\ \\ \\ \\\\ \\ 
-                   \\ \\ \\_|\\ \\|____________|\\ \\ \\|\\ \\ \\ \\|\\ \\ \\ \\ \\ \\ \\ \\ \\_\\\\ \\ 
-                    \\ \\_______\\            \\ \\_______\\ \\_______\\ \\__\\\\ \\__\\ \\_______\\ 
-                     \\|_______|             \\|_______|\\|_______|\\|__| \\|__|\\|_______|
-                    `);
+                                _______                   ________  ________  ________   ________ ________ ________  ________
+                               |\\  ___ \\                |\\   __  \\|\\   __  \\|\\   ___  \\|\\   ___ \\    
+                               \\ \\   __/|   ____________\\ \\  \\|\\ /\\ \\  \\|\\  \\ \\  \\\\ \\  \\ \\  \\_|\\ \\ 
+                                \\ \\  \\_|/__|\\____________\\ \\   __  \\ \\   __  \\ \\  \\\\ \\  \\ \\  \\ \\\\ \\ 
+                                 \\ \\  \\_|\\ \\|____________|\\ \\  \\|\\  \\ \\  \\|\\  \\ \\  \\\\ \\  \\ \\  \\_\\\\ \\ 
+                                  \\ \\_______\\              \\ \\_______\\ \\_______\\ \\__\\\\ \\__\\ \\_______\\ 
+                                   \\|_______|               \\|_______|\\|_______|\\|__| \\|__|\\|_______|
+                                   `);
         });
 
         this.socket.on('disconnect', (reason) => {
@@ -115,9 +114,13 @@ class InteractiveChatClient {
                 });
             }
 
-            // 4. Mostrar el prompt de entrada de usuario AHORA SÍ CON CONTROL MANUAL.
-            this.rl.setPrompt('\n💬 Escribe tu mensaje o número de opción: ');
-            this.rl.prompt();
+            const isDisplayingMenu = data.options && data.options.length > 0;
+            const isAskingForExplicitInput = data.type === undefined && data.message;
+
+            if (isDisplayingMenu || isAskingForExplicitInput) {
+                this.rl.setPrompt('\n💬 Escribe tu mensaje o número de opción: ');
+                this.rl.prompt(true);
+            }
         });
     }
 
@@ -136,34 +139,41 @@ class InteractiveChatClient {
                     console.log(` 📅 ${method.installments}`);
                 }
                 
-                console.log(`⏱️ ${method.processingTime}`);
+                console.log(`⏱️ ${method.processingTime || 'Tiempo de procesamiento no especificado'}`);
             });
         }
 
         if (data.securityInfo) {
             console.log('\n🛡️ Información de seguridad:');
-            if (data.securityInfo.encrypted) console.log('   ✅ Transacciones encriptadas con SSL');
-            if (data.securityInfo.fraudProtection) console.log('   ✅ Protección contra fraudes');
-            if (data.securityInfo.moneyBackGuarantee) console.log('   ✅ Garantía de devolución de 30 días');
-            if (data.securityInfo.sslCertified) console.log('   ✅ Certificado SSL');
+            if (data.securityInfo.encrypted) console.log(' ✅ Transacciones encriptadas con SSL');
+            if (data.securityInfo.fraudProtection) console.log(' ✅ Protección contra fraudes');
+            if (data.securityInfo.moneyBackGuarantee) console.log(' ✅ Garantía de devolución de 30 días');
+            if (data.securityInfo.sslCertified) console.log('✅ Certificado SSL');
         }
     }
 
-    private handleOrderHistory(data: any) {
-        console.log('\n📦 Historial de Órdenes:');
-        console.log(` Total de pedidos: ${data.totalOrders}`);
-        console.log(` Gasto total: $${data.totalSpent ? data.totalSpent.toFixed(2) : '0.00'}`);
-        console.log(` Categoría Favorita: ${data.favoriteCategory}`);
-        
-        if (data.recentOrders && data.recentOrders.length > 0) {
-            console.log('\n Últimas 3 Órdenes:');
-            data.recentOrders.forEach((order: any) => {
-                console.log(` - #${order.id} | Total: $${order.total} | Estado: ${order.status}`);
-            });
-        }
-    }
+
+private handleOrderHistory(data: any) {
+
+    const totalSpentNumber = Number(data.totalSpent) || 0; 
     
-    // NUEVO MÉTODO DE MANEJO DE ENTRADA
+    console.log('\n📦 Historial de Órdenes:');
+    console.log(` Total de pedidos: ${data.totalOrders}`);
+    
+  
+    console.log(` Gasto total: $${totalSpentNumber.toFixed(2)}`); 
+    
+    console.log(` Categoría Favorita: ${data.favoriteCategory}`);
+    
+    if (data.recentOrders && data.recentOrders.length > 0) {
+        console.log('\n Últimas 3 Órdenes:');
+        data.recentOrders.forEach((order: any) => {
+            const orderTotalFormatted = Number(order.total).toFixed(2);
+            console.log(` - #${order.id} | Total: $${orderTotalFormatted} | Estado: ${order.status}`);
+        });
+    }
+}
+    
     private handleInput(input: string) {
         const trimmedInput = input.trim();
         
@@ -171,6 +181,11 @@ class InteractiveChatClient {
             console.log('👋 Saliendo del chat...');
             this.socket.disconnect();
             this.rl.close();
+            return;
+        }
+
+        if (trimmedInput.toLowerCase() === 'menu') {
+            this.socket.emit('customer_message', { message: 'menu' });
             return;
         }
 

@@ -79,7 +79,8 @@ export class OrderService {
     async getUserOrderHistory(userId: number): Promise<Order[]> {
         return this.orderRepo.find({
             where: { user: { id: userId } },
-            relations: ['details', 'details.product'],
+            // 🚨 SOLUCIÓN: Agregamos la carga de las categorías anidadas
+            relations: ['details', 'details.product', 'details.product.categories'], 
             order: { createdAt: 'DESC' }
         });
     }

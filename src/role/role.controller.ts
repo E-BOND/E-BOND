@@ -15,7 +15,7 @@ import { UpdateRoleDto } from './dtos/update-role.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../user/entities/user.entity';
+
 
 @Controller('roles')
 //@UseGuards(JwtAuthGuard, RolesGuard)
@@ -40,7 +40,7 @@ export class RoleController {
         return this.roleService.create(dto);
     }
 
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Patch(':id')
     update(
         @Param('id', ParseIntPipe) id: number,
@@ -49,7 +49,7 @@ export class RoleController {
         return this.roleService.update(id, dto);
     }
 
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.roleService.remove(id);

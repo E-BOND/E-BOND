@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,11 +19,13 @@ import { CartModule } from './cart/cart.module';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { StripeModule } from './stripe/stripe.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -30,11 +33,12 @@ import { StripeModule } from './stripe/stripe.module';
       port: 5432,
       username: 'postgres',
       password: '1111',
-      database: 'taller5', // Nombre de la base de datos
+      database: 'taller5',
       autoLoadEntities: true,
       synchronize: true,
     }),
 
+    AuthModule, // IMPORTANTE: AuthModule debe estar ANTES que los demás
     CategoryModule,
     InvoiceModule,
     OrderModule,
@@ -46,11 +50,16 @@ import { StripeModule } from './stripe/stripe.module';
     UserModule,
     CartModule,
     ChatModule,
-    AuthModule,
     StripeModule,
   ],
 
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -14,7 +14,6 @@ import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from './entities/user.entity';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -37,14 +36,14 @@ export class UserController {
 
     /** Obtener todos los usuarios (solo ADMIN) */
     @Get()
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     async findAll() {
         return this.userService.findAll();
     }
 
     /** Obtener usuario por ID (solo ADMIN) */
     @Get(':id')
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     async findOne(@Param('id') id: number) {
         return this.userService.findOne(id);
     }
@@ -66,13 +65,13 @@ export class UserController {
     }
 
     @Patch(':id')
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     async update(@Param('id') id: number, @Body() dto: UpdateUserDto) {
         return this.userService.update(id, dto);
     }
 
     @Delete(':id')
-    @Roles(UserRole.ADMIN)
+    @Roles('ADMIN')
     async delete(@Param('id') id: number) {
         return this.userService.delete(id);
     }
