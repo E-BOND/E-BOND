@@ -32,7 +32,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '1111',
+      password: '3131',
       database: 'taller5',
       autoLoadEntities: true,
       synchronize: true,

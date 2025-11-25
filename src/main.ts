@@ -3,48 +3,60 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-    // Instancia de la aplicación
     const app = await NestFactory.create(AppModule, {
-        bodyParser: false, // CLAVE: Desactiva el body parser built-in
+        bodyParser: false,
     });
-    
-    // --- Configuración para Webhooks (Raw Body) ---
+
+    // --- Raw Body para Webhooks ---
     app.use(
         bodyParser.json({
             verify: (req: any, res, buf) => {
-                // Se captura el rawBody para la ruta del webhook de pagos
                 if (req.originalUrl.startsWith('/payments/webhook')) {
-                    req.rawBody = buf; 
+                    req.rawBody = buf;
                 }
             },
         }),
     );
-    // Re-habilitar el parser de urlencoded para el resto de las peticiones REST
     app.use(bodyParser.urlencoded({ extended: true }));
 
-    
-    // --- Configuración para WebSockets (Socket.IO) ---
-    
-    // Usar el adaptador de Socket.IO en la única instancia 'app'
-    app.useWebSocketAdapter(new IoAdapter(app)); 
+    // --- WebSockets ---
+    app.useWebSocketAdapter(new IoAdapter(app));
 
-    // Definir CORS para TODA la aplicación (REST y WebSockets)
+    // --- CORS ---
     app.enableCors({
-        origin: '*', 
+        origin: '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
     });
-    
-    // --- Pipes Globales ---
+
+    // --- Validation Pipes ---
     app.useGlobalPipes(new ValidationPipe({
         whitelist: true,
-        forbidNonWhitelisted: true, 
+        forbidNonWhitelisted: true,
         transform: true,
     }));
 
-    await app.listen(process.env.PORT ?? 3000);
+    // ==============================
+    // 📌 Swagger Config
+    // ==============================
+    const config = new DocumentBuilder()
+        .setTitle('API Documentation')
+        .setDescription('Endpoints disponibles en la API')
+        .setVersion('1.0')
+        .addBearerAuth()
+        .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document);
+
+    const port = process.env.PORT ?? 3000;
+    await app.listen(port);
+
+    console.log(`🚀 Servidor ejecutándose en http://localhost:${port}`);
+    console.log(`📘 Documentación de Swagger disponible en http://localhost:${port}/api`);
 }
 
 bootstrap();

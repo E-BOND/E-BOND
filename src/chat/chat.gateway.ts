@@ -12,7 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { Logger, ExecutionContext } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { WsJwtAuthGuard } from '../auth/guards/auth.gateway';
+import { WsJwtAuthGuard } from '../auth/gateways/auth.gateway';
 
 // -------------------------------------------------
 // 1. INTERFACES Y PROPIEDADES
