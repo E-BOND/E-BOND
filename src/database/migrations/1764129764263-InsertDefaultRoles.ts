@@ -10,8 +10,8 @@ export class InsertDefaultRoles1700000000000 implements MigrationInterface {
         await queryRunner.query(
             // Inserta los roles 1 y 2. ON CONFLICT previene errores si la tabla ya tiene datos.
             `INSERT INTO "roles" ("id", "nombre", "descripcion") 
-             VALUES (1, 'Administrador', "Acceso completo a la aplicación."),
-                    (2, 'Usuario', "Acceso básico a la aplicación.")
+             VALUES (1, 'ADMIN', "Acceso completo a la aplicación."),
+                    (2, 'CLIENT', "Acceso básico a la aplicación.")
              ON CONFLICT ("id") DO NOTHING;`
         );
     }
