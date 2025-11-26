@@ -41,6 +41,10 @@ import { ConfigService } from '@nestjs/config';
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
+        ssl: process.env.NODE_ENV === 'production' ? {
+    // Esto es necesario para que Node.js no rechace el certificado de Render
+    rejectUnauthorized: false,
+  } : false,
       }),
       
     }),
